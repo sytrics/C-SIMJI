@@ -5,12 +5,15 @@
 #include <stdio.h>
 
 #define NUM_REGS 32 //
+#define MAX_SIZE_PROGRAM 1024 // taille max de program
 
 signed regs[ NUM_REGS ]; // signed pour correspondre au CPL2
 
 // notre programme en suite de binaires
-unsigned program[] = {0x08200021,0x98000000};
-
+unsigned program[MAX_SIZE_PROGRAM];
+// TODO => mise en mémoire des instructions au bon endroit
+// placer les instructions dans programme avec l'index correspondant au numero memoire
+// procedure de chargement
 /* program counter */
 int pc = 0;
 

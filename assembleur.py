@@ -7,6 +7,8 @@ switcher = {
         }
 bin = open("instruction.bin","w")
 compteur = 0
+# TODO => mettre la condition sur imm hors des cases pour factoriser le code.
+# TODO => passer l'ecriture d'un coup au lieu de en continu.
 while len(ligne)!=0 :
     instruction = 0;
     if ligne[0]!=";" :  #pas un commentaire
