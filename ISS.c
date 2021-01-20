@@ -9,7 +9,7 @@
 signed regs[ NUM_REGS ]; // signed pour correspondre au CPL2
 
 // notre programme en suite de binaires
-unsigned program[] = { 0x1064, 0x11C8, 0x12FA, 0x2301, 0x3432, 0x0000 };
+unsigned program[] = {0x08200021,0x98000000};
 
 /* program counter */
 int pc = 0;
@@ -41,8 +41,8 @@ void decode( int instr )
     a     = (instr & 0x003FFFFF);
     n     = (instr & 0x07FFFFFF);
     regB     = (instr & 0x0000001F);
-    imm = (instr & 0x00800000) >> 21;
-    immJ = (instr & 0x08000000) >> 26;
+    imm = (instr & 0x00200000) >> 21;
+    immJ = (instr & 0x04000000) >> 26;
 
 }
 
@@ -80,14 +80,16 @@ void eval()
 
         case 1:
             /* add */
-            printf( "add r%d #%d\n", regA, o1, regB );
-            if (imm) {
+            printf( "add r%d %d r%d imm=%d\n", regA, o1, regB,imm );
+            if (imm==1) {
                 // valeure immédiate
                 regs[ regB ] = regs[ regA ] + o1;
+
             }
             else {
                 // adresse par registre
-                regs[ regB ] = regs[ regA ] + regs[o1 & 0xF];
+                regs[ regB ] = regs[ regA ] + regs[o1 & 0x1F];
+
 
             }
             break;
@@ -193,7 +195,7 @@ void eval()
             break;
         case 19:
             /* stop */
-            printf( "halt\n" );
+            printf( "stop\n" );
             running = 0;
             break;
         default:
