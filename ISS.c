@@ -34,15 +34,15 @@ int a=0;
 /* decode a word */
 void decode( int instr )
 {
-    instrNum = (instr & 0xF0000000) >> 28;
-    regA     = (instr & 0x0F000000) >> 24;
-    o1    = (instr & 0x007FFFF0) >>  4;
-    o2     = (instr & 0x07FFFFF0) >>  4;
-    a     = (instr & 0x00FFFFFF);
-    n     = (instr & 0x0FFFFFFF);
-    regB     = (instr & 0x0000000F);
+    instrNum = (instr & 0xF8000000) >> 27;
+    regA     = (instr & 0x03C00000) >> 22;
+    o1    = (instr & 0x001FFFE0) >>  5;
+    o2     = (instr & 0x01FFFFE0) >>  5;
+    a     = (instr & 0x003FFFFF);
+    n     = (instr & 0x07FFFFFF);
+    regB     = (instr & 0x0000001F);
     imm = (instr & 0x00800000) >> 21;
-    immJ = (instr & 0x08000000) >> 25;
+    immJ = (instr & 0x08000000) >> 26;
 
 }
 
@@ -78,7 +78,7 @@ void eval()
     switch( instrNum )
     {
 
-        case 0:
+        case 1:
             /* add */
             printf( "add r%d #%d\n", regA, o1, regB );
             if (imm) {
@@ -91,7 +91,7 @@ void eval()
 
             }
             break;
-        case 1:
+        case 2:
             /* sub */
             printf( "sub r%d r%d r%d\n", regA, o1, regB );
             if (imm) {
@@ -104,7 +104,7 @@ void eval()
 
             }
             break;
-        case 2:
+        case 3:
             /*mult*/
             printf( "mult r%d r%d r%d\n", regA, o1, regB );
             if (imm) {
@@ -117,81 +117,81 @@ void eval()
 
             }
             break;
-        case 3:
+        case 4:
             /*div*/
             printf("div r%d r%d r%d\n", regA, o1, regB );
             regs[ regB] = regs[regA] / o1;
             break;
-        case 4:
+        case 5:
             /*and*/
             printf("and r%d r%d r%d\n", regA, o1, regB );
             regs[ regB] = regs[regA] & o1;
             break;
-        case 5:
+        case 6:
             /*or*/
             printf("or r%d r%d r%d\n", regA, o1, regB );
             regs[ regB] = regs[regA] | o1;
             break;
-        case 6:
+        case 7:
             /*XOR*/
             printf("xor r%d r%d r%d\n", regA, o1, regB );
             regs[ regB] = regs[regA] ^ o1;
             break;
-        case 7:
+        case 8:
             /*shl*/
             printf("shl r%d r%d r%d\n", regA, o1, regB );
 
             break;
-        case 8:
+        case 9:
             /*shr*/
             printf("shr r%d r%d r%d\n", regA, o1, regB );
 
             break;
-        case 9:
+        case 10:
             /* slt */
             printf("slt r%d r%d r%d\n", regA, o1, regB );
             break;
-        case 10:
+        case 11:
             /* sle */
             printf("sle r%d r%d r%d\n", regA, o1, regB );
 
             break;
-        case 11:
+        case 12:
             /* seq */
             printf("seq r%d r%d r%d\n", regA, o1, regB );
 
             break;
-        case 12:
+        case 13:
             /*load*/
             printf("load r%d r%d r%d\n", regA, o1, regB );
 
             break;
-        case 13:
+        case 14:
             /*store*/
             printf("store r%d r%d r%d\n", regA, o1, regB );
 
             break;
-        case 14:
+        case 15:
             /*jmp*/
             printf("jmp r%d r%d\n", o2, regB);
 
             break;
-        case 15:
+        case 16:
             /*braz*/
             printf("XOR r%d r%d\n", regA, a);
 
             break;
-        case 16:
+        case 17:
             /*branz*/
             printf("XOR r%d r%d\n", regA, a);
 
             break;
-        case 17:
+        case 18:
             /*scall*/
             printf("XOR r%d\n", n);
 
             break;
-        case 18:
+        case 19:
             /* stop */
             printf( "halt\n" );
             running = 0;
