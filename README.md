@@ -12,4 +12,8 @@ project overview :
 
 ![flot_du_projet](README.assets/flot_du_projet.png)
 
+## RUN 
+
+To run the project do a simple ```make``` [WIP] 
+
 Courtesy of @JC-LL 
