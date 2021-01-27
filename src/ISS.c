@@ -220,7 +220,7 @@ void init() {
     long inst;
     long memory_index;
     char delim[] = " \n";
-    instructions = fopen("instruction.bin", "r");
+    instructions = fopen("bin/instruction.bin", "r");
     if (fgets(buffer, sizeof(char)*23, instructions)==NULL) stop=0;
     while (stop) {
         printf("buffer %s \n", buffer);
