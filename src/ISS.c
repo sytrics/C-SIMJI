@@ -3,14 +3,31 @@
 //
 
 #include <stdio.h>
+#include <string.h>
 
 #define NUM_REGS 32 //
 #define MAX_SIZE_PROGRAM 1024 // taille max de program
+
+
 
 signed regs[ NUM_REGS ]; // signed pour correspondre au CPL2
 
 // notre programme en suite de binaires
 unsigned program[MAX_SIZE_PROGRAM];
+
+FILE *instructions = fopen("instruction.bin", "r");
+char *buffer[21];
+char *line;
+int memory_index;
+fgets(buffer, sizeof(char)*21, instructions)
+while (buffer != EOF) {
+    line = strtok (&buffer, " ");
+    memory_index = st
+    fgets(buffer, sizeof(char)*21, instructions);
+}
+
+
+
 // TODO => mise en mémoire des instructions au bon endroit
 // placer les instructions dans programme avec l'index correspondant au numero memoire
 // procedure de chargement
