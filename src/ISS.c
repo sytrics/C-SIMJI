@@ -4,6 +4,8 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+
 
 #define NUM_REGS 32 //
 #define MAX_SIZE_PROGRAM 1024 // taille max de program
@@ -13,24 +15,8 @@
 signed regs[ NUM_REGS ]; // signed pour correspondre au CPL2
 
 // notre programme en suite de binaires
-unsigned program[MAX_SIZE_PROGRAM];
+long program[MAX_SIZE_PROGRAM];
 
-FILE *instructions = fopen("instruction.bin", "r");
-char *buffer[21];
-char *line;
-int memory_index;
-fgets(buffer, sizeof(char)*21, instructions)
-while (buffer != EOF) {
-    line = strtok (&buffer, " ");
-    memory_index = st
-    fgets(buffer, sizeof(char)*21, instructions);
-}
-
-
-
-// TODO => mise en mémoire des instructions au bon endroit
-// placer les instructions dans programme avec l'index correspondant au numero memoire
-// procedure de chargement
 /* program counter */
 int pc = 0;
 
@@ -225,6 +211,32 @@ void eval()
             break;
     }
 }
+void init() {
+    FILE *instructions;
+    char buffer[24] ;
+    int stop=1;
+    char *line;
+    char *ptr;
+    long inst;
+    long memory_index;
+    char delim[] = " \n";
+    instructions = fopen("instruction.bin", "r");
+    if (fgets(buffer, sizeof(char)*23, instructions)==NULL) stop=0;
+    while (stop) {
+        printf("buffer %s \n", buffer);
+        line = strtok (buffer, delim);
+        printf("line1 : %s \n", line);
+        memory_index = strtol (line,&ptr, 0);
+        line = strtok (NULL, delim);
+        printf("line2 : %s \n", line);
+        inst = strtol (line,&ptr,0);
+        program[memory_index] = inst;
+        if (fgets(buffer, sizeof(char)*23, instructions)==NULL) stop=0;
+
+    }
+    fclose(instructions);
+
+}
 
 /* display all registers as 4-digit hexadecimal words */
 void showRegs()
@@ -250,6 +262,7 @@ void run()
 
 int main( int argc, const char * argv[] )
 {
+    init();
     run();
     return 0;
 }
