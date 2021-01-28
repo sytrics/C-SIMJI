@@ -100,49 +100,93 @@ void eval()
             break;
         case 2:
             /* sub */
-            printf( "sub r%d r%d r%d\n", regA, o1, regB );
-            if (imm) {
+            printf( "sub r%d %d r%d imm=%d\n", regA, o1, regB,imm );
+            if (imm==1) {
                 // valeure immédiate
                 regs[ regB ] = regs[ regA ] - o1;
+
             }
             else {
                 // adresse par registre
-                regs[ regB ] = regs[ regA ] - regs[o1 & 0xF];
+                regs[ regB ] = regs[ regA ] - regs[o1 & 0x1F];
+
 
             }
             break;
         case 3:
-            /*mult*/
-            printf( "mult r%d r%d r%d\n", regA, o1, regB );
-            if (imm) {
+            /* mult */
+            printf( "mult r%d %d r%d imm=%d\n", regA, o1, regB,imm );
+            if (imm==1) {
                 // valeure immédiate
                 regs[ regB ] = regs[ regA ] * o1;
+
             }
             else {
                 // adresse par registre
-                regs[ regB ] = regs[ regA ] * regs[o1 & 0xF];
+                regs[ regB ] = regs[ regA ] * regs[o1 & 0x1F];
+
 
             }
             break;
         case 4:
-            /*div*/
-            printf("div r%d r%d r%d\n", regA, o1, regB );
-            regs[ regB] = regs[regA] / o1;
+            /* div */
+            printf( "div r%d %d r%d imm=%d\n", regA, o1, regB,imm );
+            if (imm==1) {
+                // valeure immédiate
+                regs[ regB ] = regs[ regA ] / o1;
+
+            }
+            else {
+                // adresse par registre
+                regs[ regB ] = regs[ regA ] / regs[o1 & 0x1F];
+
+
+            }
             break;
         case 5:
-            /*and*/
-            printf("and r%d r%d r%d\n", regA, o1, regB );
-            regs[ regB] = regs[regA] & o1;
+            /* and */
+            printf( "and r%d %d r%d imm=%d\n", regA, o1, regB,imm );
+            if (imm==1) {
+                // valeure immédiate
+                regs[ regB ] = regs[ regA ] & o1;
+
+            }
+            else {
+                // adresse par registre
+                regs[ regB ] = regs[ regA ] & regs[o1 & 0x1F];
+
+
+            }
             break;
         case 6:
-            /*or*/
-            printf("or r%d r%d r%d\n", regA, o1, regB );
-            regs[ regB] = regs[regA] | o1;
+            /* or */
+            printf( "or r%d %d r%d imm=%d\n", regA, o1, regB,imm );
+            if (imm==1) {
+                // valeure immédiate
+                regs[ regB ] = regs[ regA ] | o1;
+
+            }
+            else {
+                // adresse par registre
+                regs[ regB ] = regs[ regA ] | regs[o1 & 0x1F];
+
+
+            }
             break;
         case 7:
-            /*XOR*/
-            printf("xor r%d r%d r%d\n", regA, o1, regB );
-            regs[ regB] = regs[regA] ^ o1;
+            /* xor */
+            printf( "xor r%d %d r%d imm=%d\n", regA, o1, regB,imm );
+            if (imm==1) {
+                // valeure immédiate
+                regs[ regB ] = regs[ regA ] ^ o1;
+
+            }
+            else {
+                // adresse par registre
+                regs[ regB ] = regs[ regA ] ^ regs[o1 & 0x1F];
+
+
+            }
             break;
         case 8:
             /*shl*/
@@ -195,7 +239,7 @@ void eval()
             break;
         case 18:
             /*scall*/
-            printf("XOR r%d\n", n);
+            printf("SCALL r%d\n", n);
 
             break;
         case 19:
