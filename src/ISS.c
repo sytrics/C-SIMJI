@@ -5,11 +5,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-
 #define NUM_REGS 32 //
 #define MAX_SIZE_PROGRAM 1024 // taille max de program
 
+//TODO => ajout de la mémoire et éventuelement d'un cache
 
 
 signed regs[ NUM_REGS ]; // signed pour correspondre au CPL2
@@ -223,16 +222,12 @@ void init() {
     instructions = fopen("bin/instruction.bin", "r");
     if (fgets(buffer, sizeof(char)*23, instructions)==NULL) stop=0;
     while (stop) {
-        printf("buffer %s \n", buffer);
         line = strtok (buffer, delim);
-        printf("line1 : %s \n", line);
         memory_index = strtol (line,&ptr, 0);
         line = strtok (NULL, delim);
-        printf("line2 : %s \n", line);
         inst = strtol (line,&ptr,0);
         program[memory_index] = inst;
         if (fgets(buffer, sizeof(char)*23, instructions)==NULL) stop=0;
-
     }
     fclose(instructions);
 
