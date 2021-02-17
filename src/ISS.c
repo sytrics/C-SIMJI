@@ -8,7 +8,7 @@
 #define NUM_REGS 32 //
 #define MAX_SIZE_PROGRAM 1024 // taille max de program
 
-//TODO => ajout de la mémoire et éventuelement d'un cache
+//TODO => ajout de la mémoire 
 
 
 signed regs[ NUM_REGS ]; // signed pour correspondre au CPL2
@@ -58,7 +58,8 @@ int CPL2todec(int nombre, int taille){
     // convertit n'importe quel nombre CPL2 en int signé
     int  bit = nombre >> (taille-1);
     if (bit == 1) {
-        return -1 * (nombre - 1 << (taille-1));
+        return -1 * (nombre - (1 << (taille-1)) );
+
     }
     else {
         return nombre;
@@ -66,7 +67,7 @@ int CPL2todec(int nombre, int taille){
 }
 
 int dectoCPL2(int nombre, int taille){
-    // convertit n'importe quel int signé en binaire CPL2
+    // converti n'importe quel int signé en binaire CPL2
     if (nombre >=0) {
         return nombre;
     }
@@ -79,7 +80,7 @@ int dectoCPL2(int nombre, int taille){
 void eval()
 {
     o1 = CPL2todec(o1, 16);
-    o2 = CPL2todec(o2, 23);
+    
     switch( instrNum )
     {
 
@@ -283,7 +284,7 @@ void showRegs()
     int i;
     printf( "regs = " );
     for( i=0; i<NUM_REGS; i++ )
-        printf( "%04X ", regs[ i ] );
+        printf( "%08X ", regs[ i ] );
     printf( "\n" );
 }
 

@@ -10,7 +10,35 @@ def init() :
 
 
 # TODO => gerer les labels
-# TODO => gerer CPL2
+
+
+def CPL2(nombre, taille=16):
+        if (nombre >=0) : 
+            return nombre
+    
+        else :  
+            return (1<<(taille-1))-nombre
+    
+def label(line) : 
+    if line == "" : 
+        return None 
+    args = line.split(" ")
+    print(line)
+    if args[0][-1] == ":" : 
+        return args[0][:-1], " ".join(args[1:])
+    else: 
+        return None 
+    
+def searchlabel(lignes) : 
+    labels = {}
+    for k,ligne in enumerate(lignes) : 
+        l = label(ligne)
+        if l is not None : 
+            labels[l[0]] = k 
+    return labels 
+
+
+
 
 def bitstream_gen(lignes) :
 
@@ -39,7 +67,11 @@ def bitstream_gen(lignes) :
     compteur = 0
     bitstream = ""
     for i in lignes :
-        instruction = 0;
+        l = label(i)
+        if l is not None:
+            label_var, i = l  #si un label est trouvé on recupère le reste de la ligne dans i 
+
+        instruction = 0
         if len(i)==0 :
             break
         if i[0]!=";" :  #pas un commentaire
@@ -64,9 +96,9 @@ def bitstream_gen(lignes) :
                     imm=1
                 instruction+=imm<<21
                 if imm==0:
-                    instruction+=int(arguments[1][1])<<5
+                    instruction+=int(arguments[1][1:])<<5
                 else :
-                    instruction+=int(arguments[1][0])<<5
+                    instruction+=CPL2(int(arguments[1][0:]),16)<<5
                 instruction+=int(arguments[2][1])
 
             elif commande_int==15 :
@@ -100,10 +132,11 @@ def bitstream_gen(lignes) :
             compteur+=1
     return bitstream
 
-
 content = init()
 bin = open("instruction.bin","w")
-bin.write(bitstream_gen(content))
+lignes = bitstream_gen(content)
+print(searchlabel(content))
+bin.write(lignes)
 bin.close()
 
 
