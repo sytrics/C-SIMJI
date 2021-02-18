@@ -40,7 +40,7 @@ def searchlabel(lignes) :
 
 
 
-def bitstream_gen(lignes) :
+def bitstream_gen(lignes, labels) :
 
     switcher = {
         "add": 1,
@@ -69,6 +69,7 @@ def bitstream_gen(lignes) :
     for i in lignes :
         l = label(i)
         if l is not None:
+            
             label_var, i = l  #si un label est trouvé on recupère le reste de la ligne dans i 
 
         instruction = 0
@@ -103,16 +104,20 @@ def bitstream_gen(lignes) :
 
             elif commande_int==15 :
                 #instructions jmp
-                if arguments[0][0].isalpha():
+                if arguments[0][0]=="r":
                     imm=0
                 else :
                     imm=1
                 instruction+=imm<<26
                 if imm==0:
-                    instruction+=int(arguments[0][1])<<5
+                    #le O n'est pas immédiat 
+                    o = int(arguments[0][1:])
+                    instruction+=o<<5
                 else :
-                    instruction+=int(arguments[0][0])<<5
-                instruction+=int(arguments[1][1])
+                    #le o est immédiat, ie c'est un label 
+                    o = int(labels[arguments[0]])
+                    instruction+=o<<5
+                instruction+=int(arguments[1][1:])
 
             elif 16 <= commande_int <= 17:
                 # instructions braz,branz
@@ -134,8 +139,8 @@ def bitstream_gen(lignes) :
 
 content = init()
 bin = open("instruction.bin","w")
-lignes = bitstream_gen(content)
-print(searchlabel(content))
+labels = searchlabel(content)
+lignes = bitstream_gen(content, labels)
 bin.write(lignes)
 bin.close()
 

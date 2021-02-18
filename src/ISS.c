@@ -9,13 +9,14 @@
 #define MAX_SIZE_PROGRAM 1024 // taille max de program
 
 //TODO => ajout de la mémoire 
-
+//TODO => prise en compte du jump dans le fetching 
 
 signed regs[ NUM_REGS ]; // signed pour correspondre au CPL2
 
 // notre programme en suite de binaires
 long program[MAX_SIZE_PROGRAM];
 
+signed memory[MAX_SIZE_PROGRAM]; 
 /* program counter */
 int pc = 0;
 
@@ -225,7 +226,13 @@ void eval()
             break;
         case 15:
             /*jmp*/
-            printf("jmp r%d r%d\n", o2, regB);
+            if (immJ == 1) {
+                printf("jmp %d r%d\n", o2, regB);
+            } else {
+                printf("jmp r%d r%d\n", o2, regB);
+            }
+            pc = o2;
+
 
             break;
         case 16:
@@ -241,6 +248,7 @@ void eval()
         case 18:
             /*scall*/
             printf("SCALL r%d\n", n);
+            printf("r%d === > %08X",n ,regs[n]); 
 
             break;
         case 19:
