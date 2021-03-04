@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 #define NUM_REGS 32 //
 #define MAX_SIZE_PROGRAM 1024 // taille max de program
 
@@ -12,17 +13,21 @@
 //TODO => prise en compte du jump dans le fetching 
 
 signed regs[ NUM_REGS ]; // signed pour correspondre au CPL2
-
+signed scall; // temp variable for scall 
 // notre programme en suite de binaires
 long program[MAX_SIZE_PROGRAM];
 
 signed memory[MAX_SIZE_PROGRAM]; 
 /* program counter */
 int pc = 0;
+int Benchnum = 0; 
+double Benchtime = 0; 
+clock_t before; 
 
 /* fetch the next word from the program */
 int fetch()
 {
+    Benchnum ++; 
     return program[ pc++ ];
 }
 
@@ -116,8 +121,8 @@ void eval()
             }
             break;
         case 3:
-            /* mult */
-            printf( "mult r%d %d r%d imm=%d\n", regA, o1, regB,imm );
+            /* mul */
+            printf( "mul r%d %d r%d imm=%d\n", regA, o1, regB,imm );
             if (imm==1) {
                 // valeure immédiate
                 regs[ regB ] = regs[ regA ] * o1;
@@ -193,36 +198,113 @@ void eval()
         case 8:
             /*shl*/
             printf("shl r%d r%d r%d\n", regA, o1, regB );
+            if (imm==1) {
+                // valeure immédiate
+                regs[ regB ] = regs[ regA ] << o1;
 
+            }
+            else {
+                // adresse par registre
+                regs[ regB ] = regs[ regA ] << regs[o1 & 0x1F];
+
+
+            }
             break;
         case 9:
             /*shr*/
             printf("shr r%d r%d r%d\n", regA, o1, regB );
+            if (imm==1) {
+                // valeure immédiate
+                regs[ regB ] = regs[ regA ] >> o1;
 
+            }
+            else {
+                // adresse par registre
+                regs[ regB ] = regs[ regA ] >> regs[o1 & 0x1F];
+
+
+            }
             break;
         case 10:
             /* slt */
             printf("slt r%d r%d r%d\n", regA, o1, regB );
+            if (imm==1) {
+                // valeure immédiate
+                if (regs[ regA ] < o1) {regs[regA] = 1;}
+                     
+                else {regs[regA] = 0;}
+            
+            }
+            else {
+                // adresse par registre
+                
+                if (regs[ regA ] < regs[o1 & 0x1F]) {regs[regA] = 1;}
+                     
+                else {regs[regA] = 0;}
+            
+
+            }
             break;
+            
         case 11:
             /* sle */
             printf("sle r%d r%d r%d\n", regA, o1, regB );
+            if (imm==1) {
+                // valeure immédiate
+                if (regs[ regA ] <= o1) {regs[regA] = 1;}
+                     
+                else {regs[regA] = 0;}
+            
+            }
+            else {
+                // adresse par registre
+                
+                if (regs[ regA ] <= regs[o1 & 0x1F]) {regs[regA] = 1;}
+                     
+                else {regs[regA] = 0;}
+            
 
+            }
             break;
         case 12:
             /* seq */
             printf("seq r%d r%d r%d\n", regA, o1, regB );
+            if (imm==1) {
+                // valeure immédiate
+                if (regs[ regA ] == o1) {regs[regA] = 1;}
+                     
+                else {regs[regA] = 0;}
+            
+            }
+            else {
+                // adresse par registre
+                
+                if (regs[ regA ] == regs[o1 & 0x1F]) {regs[regA] = 1;}
+                     
+                else {regs[regA] = 0;}
+            
 
+            }
             break;
         case 13:
             /*load*/
             printf("load r%d r%d r%d\n", regA, o1, regB );
-
+            if (imm==1) {
+                regs[ regB ] = memory[regs[regA]+o1];
+            } 
+            else {
+                regs[ regB ] = memory[regs[regA]+regs[o1 & 0x1F]];
+            }
             break;
         case 14:
             /*store*/
             printf("store r%d r%d r%d\n", regA, o1, regB );
-
+            if (imm==1) {
+                memory[regs[regA]+o1] = regs[ regB ];
+            } 
+            else {
+                memory[regs[regA]+regs[o1 & 0x1F]] = regs[ regB ];
+            }
             break;
         case 15:
             /*jmp*/
@@ -232,26 +314,41 @@ void eval()
                 printf("jmp r%d r%d\n", o2, regB);
             }
             pc = o2;
+            if (regB != 0) {
+                regs[regB] = o2;
+            }
+            
 
 
             break;
         case 16:
             /*braz*/
-            printf("XOR r%d r%d\n", regA, a);
-
+            printf("braz r%d %d\n", regA, a);
+            if (regs[regA]==0) pc = a;
             break;
         case 17:
             /*branz*/
-            printf("XOR r%d r%d\n", regA, a);
-
+            printf("branz r%d %d\n", regA, a);
+            if (regs[regA]!=0) pc = a;
             break;
         case 18:
             /*scall*/
             printf("SCALL r%d\n", n);
-            printf("r%d === > %08X",n ,regs[n]); 
+            if (n!=0) {printf("r%d === > %08X \n",n ,regs[n]);} 
+            else {
+                // appel systeme et stockage dans r1
+                // arret du compteur
+                Benchtime += (clock()-before); 
+                printf("enter N: "); 
+                scanf("%d", &scall);
+                regs[1] = scall;
+                // reprise du compteur 
+                before = clock();
+            }
+            // time delta 
 
             break;
-        case 19:
+        case 0:
             /* stop */
             printf( "stop\n" );
             running = 0;
@@ -264,6 +361,9 @@ void eval()
     }
 }
 void init() {
+    // start counter 
+    before = clock();
+
     FILE *instructions;
     char buffer[24] ;
     int stop=1;
@@ -283,6 +383,8 @@ void init() {
         if (fgets(buffer, sizeof(char)*23, instructions)==NULL) stop=0;
     }
     fclose(instructions);
+    
+    
 
 }
 
@@ -306,11 +408,17 @@ void run()
         eval();
     }
     showRegs();
+    Benchtime += (clock()-before); 
 }
 
 int main( int argc, const char * argv[] )
 {
     init();
     run();
+    printf("==================END=================\n");
+    printf("Benchmark results : \n");
+    printf("ops complexity : %d operations \n", Benchnum);
+    printf("number of CPU ticks %.0f \n", Benchtime);
+    printf("time complexity : %.3f ms \n", Benchtime*1000/CLOCKS_PER_SEC );
     return 0;
 }

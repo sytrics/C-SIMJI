@@ -1,6 +1,6 @@
 
 def init() :
-    fichier = open("command.asm","r")
+    fichier = open("bin/command.asm","r")
     assembly = fichier.read()
     fichier.close()
     ligne = assembly.split("\n")
@@ -45,7 +45,7 @@ def bitstream_gen(lignes, labels) :
     switcher = {
         "add": 1,
         "sub": 2,
-        "mult": 3,
+        "mul": 3,
         "div": 4,
         "and": 5,
         "or": 6,
@@ -61,7 +61,7 @@ def bitstream_gen(lignes, labels) :
         "braz": 16,
         "branz": 17,
         "scall": 18,
-        "stop": 19
+        "stop": 0
     }
 
     compteur = 0
@@ -81,7 +81,7 @@ def bitstream_gen(lignes, labels) :
 
             if commande_int==18 :
                 arguments = commande_char[1]
-            elif commande_int==19 :
+            elif commande_int==0 :
                 arguments = 0
             else :
                 arguments = commande_char[1].split(",")
@@ -90,7 +90,7 @@ def bitstream_gen(lignes, labels) :
 
             if 1<=commande_int<=14 :
                 #instructions codeop
-                instruction+=int(arguments[0][1])<<22
+                instruction+=int(arguments[0][1:])<<22
                 if arguments[1][0]=='r':
                     imm=0
                 else :
@@ -100,7 +100,7 @@ def bitstream_gen(lignes, labels) :
                     instruction+=int(arguments[1][1:])<<5
                 else :
                     instruction+=CPL2(int(arguments[1][0:]),16)<<5
-                instruction+=int(arguments[2][1])
+                instruction+=int(arguments[2][1:])
 
             elif commande_int==15 :
                 #instructions jmp
@@ -121,14 +121,14 @@ def bitstream_gen(lignes, labels) :
 
             elif 16 <= commande_int <= 17:
                 # instructions braz,branz
-                instruction += int(arguments[0][1])<<22
-                instruction += int(arguments[1][1])
+                instruction += int(arguments[0][1:])<<22
+                instruction += int(labels[arguments[1]])
 
             elif commande_int==18 :
                 # instruction scall
                 instruction +=int(arguments[0])
 
-            elif commande_int==19 :
+            elif commande_int==0 :
                 # instruction stop
                 pass
             iteration = '0x%08X' % compteur+" "+ '0x%08X' % instruction
@@ -138,7 +138,7 @@ def bitstream_gen(lignes, labels) :
     return bitstream
 
 content = init()
-bin = open("instruction.bin","w")
+bin = open("bin/instruction.bin","w")
 labels = searchlabel(content)
 lignes = bitstream_gen(content, labels)
 bin.write(lignes)
