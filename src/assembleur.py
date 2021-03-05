@@ -1,35 +1,33 @@
+import sys #used for asm argument 
 
 def init() :
-    fichier = open("bin/command.asm","r")
+    fichier = open("asm/"+ sys.argv[1],"r")
     assembly = fichier.read()
     fichier.close()
     ligne = assembly.split("\n")
     for i in ligne :
         i.strip()
-    return ligne
-
-
-# TODO => gerer les labels
+    return ligne  # reading file in one go and storing everything in memory
 
 
 def CPL2(nombre, taille=16):
+    #converts signed int into two's complement binary representation
         if (nombre >=0) : 
             return nombre
     
         else :  
             return (1<<(taille-1))-nombre
     
-def label(line) : 
+def label(line) : # search a label in a line and returns it 
     if line == "" : 
         return None 
     args = line.split(" ")
-    print(line)
     if args[0][-1] == ":" : 
         return args[0][:-1], " ".join(args[1:])
     else: 
         return None 
     
-def searchlabel(lignes) : 
+def searchlabel(lignes) : # find all labels of the file and creates a dictionary of labels 
     labels = {}
     for k,ligne in enumerate(lignes) : 
         l = label(ligne)
@@ -40,9 +38,9 @@ def searchlabel(lignes) :
 
 
 
-def bitstream_gen(lignes, labels) :
+def bitstream_gen(lignes, labels) : # generate the bitstream of instructions 
 
-    switcher = {
+    switcher = {  # MiniMIPS instruction set 
         "add": 1,
         "sub": 2,
         "mul": 3,
@@ -64,21 +62,21 @@ def bitstream_gen(lignes, labels) :
         "stop": 0
     }
 
-    compteur = 0
+    compteur = 0  
     bitstream = ""
     for i in lignes :
         l = label(i)
         if l is not None:
             
-            label_var, i = l  #si un label est trouvé on recupère le reste de la ligne dans i 
+            label_var, i = l  #if a label is found, it modifies i to remove the label
 
         instruction = 0
         if len(i)==0 :
             break
-        if i[0]!=";" :  #pas un commentaire
+        if i[0]!=";" :  #not a commment line (DOES NOT WORK, messing with label indexes)
             commande_char = i.split()
             commande_int = switcher.get(commande_char[0], 0)
-
+            # parsing instructions into command and arguments 
             if commande_int==18 :
                 arguments = commande_char[1]
             elif commande_int==0 :
@@ -110,11 +108,11 @@ def bitstream_gen(lignes, labels) :
                     imm=1
                 instruction+=imm<<26
                 if imm==0:
-                    #le O n'est pas immédiat 
+                    #o is not immediate 
                     o = int(arguments[0][1:])
                     instruction+=o<<5
                 else :
-                    #le o est immédiat, ie c'est un label 
+                    #o is immediate, it's a label 
                     o = int(labels[arguments[0]])
                     instruction+=o<<5
                 instruction+=int(arguments[1][1:])
@@ -137,11 +135,12 @@ def bitstream_gen(lignes, labels) :
             compteur+=1
     return bitstream
 
-content = init()
-bin = open("bin/instruction.bin","w")
-labels = searchlabel(content)
-lignes = bitstream_gen(content, labels)
-bin.write(lignes)
+
+content = init() #reading the asm file
+bin = open("bin/instruction.bin","w") #opening the instruction file to be written
+labels = searchlabel(content) # searching labels into asm 
+lignes = bitstream_gen(content, labels) # creating instructions corresponding to asm
+bin.write(lignes) # writting instructions in one go
 bin.close()
 
 

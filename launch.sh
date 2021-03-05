@@ -1,2 +1,2 @@
-python3 bin/assembleur.py 
+python3 src/assembleur.py matrixN.asm
 make 

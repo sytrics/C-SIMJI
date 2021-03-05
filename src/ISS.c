@@ -7,22 +7,19 @@
 #include <stdlib.h>
 #include <time.h>
 #define NUM_REGS 32 //
-#define MAX_SIZE_PROGRAM 1024 // taille max de program
+#define MAX_SIZE_PROGRAM 1024 // max size of program
 
-//TODO => ajout de la mémoire 
-//TODO => prise en compte du jump dans le fetching 
-
-signed regs[ NUM_REGS ]; // signed pour correspondre au CPL2
-signed scall; // temp variable for scall 
-// notre programme en suite de binaires
+signed regs[ NUM_REGS ]; // signed to correspond two's complement
+signed scall; // temp variable used in scall 
+// our programm is a list of binary instructions 
 long program[MAX_SIZE_PROGRAM];
-
+// the memory which can be used with store and load isntructions
 signed memory[MAX_SIZE_PROGRAM]; 
 /* program counter */
 int pc = 0;
-int Benchnum = 0; 
-double Benchtime = 0; 
-clock_t before; 
+int Benchnum = 0; // ops complexity 
+double Benchtime = 0;  // time complexity
+clock_t before; // time counter
 
 /* fetch the next word from the program */
 int fetch()
@@ -57,11 +54,11 @@ void decode( int instr )
 
 }
 
-/* the VM runs until this flag becomes 0 */
+/* the ISS runs until this flag becomes 0 */
 int running = 1;
 
 int CPL2todec(int nombre, int taille){
-    // convertit n'importe quel nombre CPL2 en int signé
+    // converts any two's complement binary number into signed int
     int  bit = nombre >> (taille-1);
     if (bit == 1) {
         return -1 * (nombre - (1 << (taille-1)) );
@@ -72,15 +69,6 @@ int CPL2todec(int nombre, int taille){
     }
 }
 
-int dectoCPL2(int nombre, int taille){
-    // converti n'importe quel int signé en binaire CPL2
-    if (nombre >=0) {
-        return nombre;
-    }
-    else {
-        return (1<<(taille-1))-nombre;
-    }
-}
 
 /* evaluate the last decoded instruction */
 void eval()
@@ -94,12 +82,12 @@ void eval()
             /* add */
             printf( "add r%d %d r%d imm=%d\n", regA, o1, regB,imm );
             if (imm==1) {
-                // valeure immédiate
+                // immediate value
                 regs[ regB ] = regs[ regA ] + o1;
 
             }
             else {
-                // adresse par registre
+                // adress accessed with register
                 regs[ regB ] = regs[ regA ] + regs[o1 & 0x1F];
 
 
@@ -109,12 +97,12 @@ void eval()
             /* sub */
             printf( "sub r%d %d r%d imm=%d\n", regA, o1, regB,imm );
             if (imm==1) {
-                // valeure immédiate
+                // immediate value
                 regs[ regB ] = regs[ regA ] - o1;
 
             }
             else {
-                // adresse par registre
+                // adress accessed with register
                 regs[ regB ] = regs[ regA ] - regs[o1 & 0x1F];
 
 
@@ -124,12 +112,12 @@ void eval()
             /* mul */
             printf( "mul r%d %d r%d imm=%d\n", regA, o1, regB,imm );
             if (imm==1) {
-                // valeure immédiate
+                // immediate value
                 regs[ regB ] = regs[ regA ] * o1;
 
             }
             else {
-                // adresse par registre
+                // adress accessed with register
                 regs[ regB ] = regs[ regA ] * regs[o1 & 0x1F];
 
 
@@ -139,12 +127,12 @@ void eval()
             /* div */
             printf( "div r%d %d r%d imm=%d\n", regA, o1, regB,imm );
             if (imm==1) {
-                // valeure immédiate
+                // immediate value
                 regs[ regB ] = regs[ regA ] / o1;
 
             }
             else {
-                // adresse par registre
+                // adress accessed with register
                 regs[ regB ] = regs[ regA ] / regs[o1 & 0x1F];
 
 
@@ -154,12 +142,12 @@ void eval()
             /* and */
             printf( "and r%d %d r%d imm=%d\n", regA, o1, regB,imm );
             if (imm==1) {
-                // valeure immédiate
+                // immediate value
                 regs[ regB ] = regs[ regA ] & o1;
 
             }
             else {
-                // adresse par registre
+                // adress accessed with register
                 regs[ regB ] = regs[ regA ] & regs[o1 & 0x1F];
 
 
@@ -169,12 +157,12 @@ void eval()
             /* or */
             printf( "or r%d %d r%d imm=%d\n", regA, o1, regB,imm );
             if (imm==1) {
-                // valeure immédiate
+                // immediate value
                 regs[ regB ] = regs[ regA ] | o1;
 
             }
             else {
-                // adresse par registre
+                // adress accessed with register
                 regs[ regB ] = regs[ regA ] | regs[o1 & 0x1F];
 
 
@@ -184,12 +172,12 @@ void eval()
             /* xor */
             printf( "xor r%d %d r%d imm=%d\n", regA, o1, regB,imm );
             if (imm==1) {
-                // valeure immédiate
+                // immediate value
                 regs[ regB ] = regs[ regA ] ^ o1;
 
             }
             else {
-                // adresse par registre
+                // adress accessed with register
                 regs[ regB ] = regs[ regA ] ^ regs[o1 & 0x1F];
 
 
@@ -199,12 +187,12 @@ void eval()
             /*shl*/
             printf("shl r%d r%d r%d\n", regA, o1, regB );
             if (imm==1) {
-                // valeure immédiate
+                // immediate value
                 regs[ regB ] = regs[ regA ] << o1;
 
             }
             else {
-                // adresse par registre
+                // adress accessed with register
                 regs[ regB ] = regs[ regA ] << regs[o1 & 0x1F];
 
 
@@ -214,12 +202,12 @@ void eval()
             /*shr*/
             printf("shr r%d r%d r%d\n", regA, o1, regB );
             if (imm==1) {
-                // valeure immédiate
+                // immediate value
                 regs[ regB ] = regs[ regA ] >> o1;
 
             }
             else {
-                // adresse par registre
+                // adress accessed with register
                 regs[ regB ] = regs[ regA ] >> regs[o1 & 0x1F];
 
 
@@ -229,14 +217,14 @@ void eval()
             /* slt */
             printf("slt r%d r%d r%d\n", regA, o1, regB );
             if (imm==1) {
-                // valeure immédiate
+                // immediate value
                 if (regs[ regA ] < o1) {regs[regA] = 1;}
                      
                 else {regs[regA] = 0;}
             
             }
             else {
-                // adresse par registre
+                // adress accessed with register
                 
                 if (regs[ regA ] < regs[o1 & 0x1F]) {regs[regA] = 1;}
                      
@@ -250,14 +238,14 @@ void eval()
             /* sle */
             printf("sle r%d r%d r%d\n", regA, o1, regB );
             if (imm==1) {
-                // valeure immédiate
+                // immediate value
                 if (regs[ regA ] <= o1) {regs[regA] = 1;}
                      
                 else {regs[regA] = 0;}
             
             }
             else {
-                // adresse par registre
+                // adress accessed with register
                 
                 if (regs[ regA ] <= regs[o1 & 0x1F]) {regs[regA] = 1;}
                      
@@ -270,14 +258,14 @@ void eval()
             /* seq */
             printf("seq r%d r%d r%d\n", regA, o1, regB );
             if (imm==1) {
-                // valeure immédiate
+                // immediate value
                 if (regs[ regA ] == o1) {regs[regA] = 1;}
                      
                 else {regs[regA] = 0;}
             
             }
             else {
-                // adresse par registre
+                // adress accessed with register
                 
                 if (regs[ regA ] == regs[o1 & 0x1F]) {regs[regA] = 1;}
                      
@@ -336,16 +324,15 @@ void eval()
             printf("SCALL r%d\n", n);
             if (n!=0) {printf("r%d === > %08X \n",n ,regs[n]);} 
             else {
-                // appel systeme et stockage dans r1
-                // arret du compteur
+                // systeme call and store value in r1
+                // counting is stopped
                 Benchtime += (clock()-before); 
                 printf("enter N: "); 
                 scanf("%d", &scall);
                 regs[1] = scall;
-                // reprise du compteur 
+                // restart counting 
                 before = clock();
             }
-            // time delta 
 
             break;
         case 0:
@@ -372,7 +359,7 @@ void init() {
     long inst;
     long memory_index;
     char delim[] = " \n";
-    instructions = fopen("bin/instruction.bin", "r");
+    instructions = fopen("bin/instruction.bin", "r"); //instructions found in instruction.bin
     if (fgets(buffer, sizeof(char)*23, instructions)==NULL) stop=0;
     while (stop) {
         line = strtok (buffer, delim);
