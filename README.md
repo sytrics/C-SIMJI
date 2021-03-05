@@ -58,7 +58,7 @@ Here are the major points to consider regarding my work :
 
 * The ISS is written in c for performance, the assembly program is written in python for easier syntax. 
 
-* Regarding the assembly syntax, due to the way i parse the lines in python, make sure to NOT INCLUDE SPACES BEFORE INSTRUCTIONS. Also the comments are not implemented yet (in a completed line, to comment use an other line) . 
+* Regarding the assembly syntax, due to the way i parse the lines in python, make sure to NOT INCLUDE SPACES BEFORE INSTRUCTIONS. Also the comments are not implemented yet. 
 
 * For each instruction, you'll get the states of the registers in the terminal along with the written instructions corresponding to the line like that : 
 
